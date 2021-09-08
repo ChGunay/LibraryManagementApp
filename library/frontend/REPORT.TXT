@@ -1,0 +1,4 @@
+create rating and product component: ilk 3 dakika
+build product screen:ilk 6.03 dakika
+axios is a library to send ajax request to server
+load products from backend ilk 8 dakika
