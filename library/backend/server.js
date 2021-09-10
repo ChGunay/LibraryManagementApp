@@ -1,15 +1,15 @@
 import express from 'express';
-import dotenv from 'dotenv'
-
+import dotenv from "dotenv";
 import mongoose from "mongoose";
 import userRouter from './routers/userRouter.js';
 import bookRouter from './routers/bookRouter.js';
 dotenv.config();
+
+
 //In this file i created a basic server using npm express tp start implementing backend of the project
 const app = express(); //app is the express server 
 app.use(express.json());
-app.use(express.urlencoded({extended: true}))
-
+app.use(express.urlencoded({ extended: true }));
 //connect mongodb
 mongoose.connect("mongodb://localhost/library",{
  
@@ -25,6 +25,7 @@ mongoose.connect("mongodb://localhost/library",{
 
 app.use("/api/users",userRouter);
 app.use("/api/books",bookRouter);
+
 
 //checking if server setup is complate
 app.get('/', (req, res) => {
