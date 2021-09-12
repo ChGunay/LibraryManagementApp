@@ -2,7 +2,7 @@ import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import data from '../data.js';
 import User from '../models/userModel.js';
-import { generateToken } from '../utils.js';
+import { generateToken, isAdmin, isAuth } from '../utils.js';
 
 const userRouter = express.Router();//creating routers with express
 
@@ -24,16 +24,17 @@ userRouter.post(
     //ajax request to check user email in the database
     const user = await User.findOne({ email: req.body.email });
     if (user) {//if user exist with correct email check password
-      if (req.body.password==user.password) {
-        res.send({
-          //data to send
-          _id: user._id,
-          name: user.name,
-          email: user.email,
-          isAdmin: user.isAdmin,
-          //i will use json web token to generate custom tokens
-          token: generateToken(user),
-        });
+      if (req.body.password==user.password&&user.isVertified) {
+          res.send({
+            //data to send
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            isVertified:user.isVertified,
+            //i will use json web token to generate custom tokens
+            token: generateToken(user),
+          });
         return;
       }
     }
@@ -71,6 +72,76 @@ userRouter.get(
     }
   })
 );
+
+userRouter.put(
+  '/profile',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.user._id);
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      if (req.body.password) {
+        user.password = req.body.password;
+      }
+      const updatedUser = await user.save();
+      res.send({
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+        isVertified: updatedUser.isVertified,
+        token: generateToken(updatedUser),
+      });
+    }
+  })
+);
+userRouter.get(
+  '/',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const users = await User.find({});
+    res.send(users);
+  })
+);
+userRouter.delete(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      if (user.email === 'admin@gmail.com') {
+        res.status(400).send({ message: 'Can Not Delete Admin User' });
+        return;
+      }
+      const deleteUser = await user.remove();
+      res.send({ message: 'User Deleted', user: deleteUser });
+    } else {
+      res.status(404).send({ message: 'User Not Found' });
+    }
+  })
+);
+userRouter.put(
+  '/:id',
+  isAuth,
+  isAdmin,
+  expressAsyncHandler(async (req, res) => {
+    const user = await User.findById(req.params.id);
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.isVertified = req.body.isVertified || user.isVertified;
+      user.isAdmin = req.body.isAdmin || user.isAdmin;
+      const updatedUser = await user.save();
+      res.send({ message: 'User Updated', user: updatedUser });
+    } else {
+      res.status(404).send({ message: 'User Not Found' });
+    }
+  })
+);
+
 
 
 export default userRouter;

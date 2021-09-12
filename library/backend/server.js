@@ -1,8 +1,11 @@
 import express from 'express';
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import path from 'path';
+
 import userRouter from './routers/userRouter.js';
 import bookRouter from './routers/bookRouter.js';
+import uploadRouter from './routers/uploadRouter.js';
 dotenv.config();
 
 
@@ -22,10 +25,12 @@ mongoose.connect("mongodb://localhost/library",{
   
   res.send(data.books);
 }); */
+app.use('/api/uploads', uploadRouter);
 
 app.use("/api/users",userRouter);
 app.use("/api/books",bookRouter);
-
+const __dirname = path.resolve();
+app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 
 //checking if server setup is complate
 app.get('/', (req, res) => {

@@ -31,7 +31,7 @@ export default function SigninScreen(props) {
         <div>
           <h1>Sign In</h1>
         </div>
-        {error&&<p>{error}</p>}
+        {error&&<p>{error} or not vertified yet</p>}
         <div>
           <label htmlFor="email">Email address</label>
           <input
@@ -54,7 +54,7 @@ export default function SigninScreen(props) {
         </div>
         <div>
           <label />
-          <button className="primary" type="submit">
+          <button className="small" type="submit">
             Sign In
           </button>
         </div>
