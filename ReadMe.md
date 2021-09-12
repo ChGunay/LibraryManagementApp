@@ -20,7 +20,7 @@ Admin who owns the web application with the project:
 Application members:
 * 1-) They can edit their own profiles.
 * 2-) Can view the available books in the application.
-***Admin login information-->admin@gmail.comadmin***
+***Admin login information-->admin@gmail.com:admin***
 
 
 ## Authorizations of application members:
